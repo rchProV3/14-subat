@@ -6,21 +6,45 @@
     <title>Sonsuzluk</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; font-family: sans-serif; }
-        
-        /* Kalp Ekranı (Tarayıcı için) */
-        #heart-view { display: flex; flex-direction: column; align-items: center; }
-        .heart { font-size: 80px; animation: beat 1.2s infinite; cursor: pointer; filter: drop-shadow(0 0 20px red); text-decoration: none; }
-        
-        /* Yükleme Ekranı (PWA için) */
-        #loader-view { display: none; flex-direction: column; align-items: center; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(212,175,55,0.1); border-top: 3px solid #d4af37; border-radius: 50%; animation: spin 1s linear infinite; }
-        .loading-text { margin-top: 15px; color: #d4af37; font-size: 0.8rem; letter-spacing: 3px; font-weight: 300; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; display: flex; align-items: center; 
+            justify-content: center; overflow: hidden; 
+        }
 
-        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        /* Ana Sayfadaki Sabit Kalp */
+        .heart {
+            font-size: 100px;
+            filter: drop-shadow(0 0 20px rgba(255,0,0,0.5));
+            user-select: none;
+            transition: 0.5s;
+        }
+
+        /* Uygulama Modunda Açıldığında Gelecek Yükleme Efekti */
+        #loader {
+            display: none;
+            position: fixed;
+            flex-direction: column;
+            align-items: center;
+        }
+        .spinner {
+            width: 30px; height: 30px;
+            border: 2px solid rgba(212,175,55,0.1);
+            border-top: 2px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text {
+            margin-top: 15px;
+            color: #d4af37;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -28,30 +52,29 @@
 
     <div id="heart-view">
         <div class="heart">❤️</div>
-        <p style="color: #222; margin-top: 20px; font-size: 0.7rem;">GÜVENLİ BAĞLANTI</p>
     </div>
 
-    <div id="loader-view">
+    <div id="loader">
         <div class="spinner"></div>
-        <div class="loading-text">SİSTEM YÜKLENİYOR...</div>
+        <div class="loading-text">Yükleniyor</div>
     </div>
 
     <script>
-        // PWA Modunda mı açıldı kontrol et (Standalone)
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        // PWA MODU KONTROLÜ
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-        if (isPWA) {
-            // Eğer uygulamaysa kalp görünümünü gizle, loader'ı göster
+        if (isStandalone) {
+            // Eğer uygulama (PWA) olarak açıldıysa:
             document.getElementById('heart-view').style.display = 'none';
-            document.getElementById('loader-view').style.display = 'flex';
+            document.getElementById('loader').style.display = 'flex';
 
-            // 2.5 saniye sonra we.html'e yönlendir
+            // 1.5 saniye sonra gizli sayfaya (we.html) yönlendir
             setTimeout(() => {
                 window.location.href = "we.html";
-            }, 2500);
+            }, 1500);
         }
 
-        // Service Worker Kaydı
+        // Service Worker (PWA olması için şart)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
