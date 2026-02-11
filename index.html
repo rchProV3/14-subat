@@ -2,51 +2,59 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sonsuzluk</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <style>
-        body {
-            margin: 0;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; font-family: sans-serif; }
+        
+        /* Kalp Ekranı (Tarayıcı için) */
+        #heart-view { display: flex; flex-direction: column; align-items: center; }
+        .heart { font-size: 80px; animation: beat 1.2s infinite; cursor: pointer; filter: drop-shadow(0 0 20px red); text-decoration: none; }
+        
+        /* Yükleme Ekranı (PWA için) */
+        #loader-view { display: none; flex-direction: column; align-items: center; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(212,175,55,0.1); border-top: 3px solid #d4af37; border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-text { margin-top: 15px; color: #d4af37; font-size: 0.8rem; letter-spacing: 3px; font-weight: 300; }
 
-        .heart {
-            font-size: 80px;
-            cursor: pointer;
-            animation: heartbeat 1.2s infinite;
-            filter: drop-shadow(0 0 20px #ff0000);
-            text-decoration: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.3); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.15); }
-            70% { transform: scale(1); }
-        }
-
-        .text {
-            position: absolute;
-            bottom: 20%;
-            color: #333;
-            font-family: Arial, sans-serif;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-        }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <a href="we.html" class="heart">❤️</a>
-    <div class="text">DOKUN</div>
+    <div id="heart-view">
+        <div class="heart">❤️</div>
+        <p style="color: #222; margin-top: 20px; font-size: 0.7rem;">GÜVENLİ BAĞLANTI</p>
+    </div>
 
+    <div id="loader-view">
+        <div class="spinner"></div>
+        <div class="loading-text">SİSTEM YÜKLENİYOR...</div>
+    </div>
+
+    <script>
+        // PWA Modunda mı açıldı kontrol et (Standalone)
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        if (isPWA) {
+            // Eğer uygulamaysa kalp görünümünü gizle, loader'ı göster
+            document.getElementById('heart-view').style.display = 'none';
+            document.getElementById('loader-view').style.display = 'flex';
+
+            // 2.5 saniye sonra we.html'e yönlendir
+            setTimeout(() => {
+                window.location.href = "we.html";
+            }, 2500);
+        }
+
+        // Service Worker Kaydı
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
